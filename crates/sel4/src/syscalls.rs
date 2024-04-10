@@ -191,6 +191,14 @@ impl<C: InvocationContext> Notification<C> {
         (wait_message_info_from_sys(info), badge)
     }
 
+    /// Corresponds to `seL4_Poll`.
+    pub fn poll(self) -> (MessageInfo, Badge) {
+        let (info, badge) =
+            self.invoke(|cptr, ipc_buffer| ipc_buffer.inner_mut().seL4_Poll(cptr.bits()));
+        // (wait_message_info_from_sys(info), badge)
+        (MessageInfo::from_inner(info), badge)
+    }
+
     pub fn register_receiver(self, tcb: CPtr) -> Result<()> {
         Error::wrap(self.invoke(|cptr, ipc_buffer| ipc_buffer.inner_mut().seL4_Uint_Notification_register_receiver(cptr.bits(), tcb.bits())))
     }
