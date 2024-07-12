@@ -66,7 +66,7 @@ fn main(per_core: <ArchImpl as Arch>::PerCore) -> ! {
 
     payload.sanity_check(&PLATFORM_INFO, own_footprint.clone());
 
-    log::debug!("Copying payload data");
+    log::debug!("Test script:Copying payload data");
     unsafe {
         payload.copy_data_out(region_content_source);
     }
