@@ -9,8 +9,7 @@ cargo install \
             --root .. \
             --path ./crates/sel4-kernel-loader \
             sel4-kernel-loader
+ 
+sudo cp ../bin/sel4-kernel-loader /deps/bin/
 
-# after this , use 
-# sudo cp ../bin/sel4-kernel-loader /deps/bin/
-# to copy result to the install directory
-
+cd ../work && make run
