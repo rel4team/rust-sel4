@@ -20,6 +20,12 @@ pub(crate) mod exception_handler;
 extern "C" {
     fn switch_translation_tables_el2();
 }
+extern "C" {
+    fn drop_to_el1();
+}
+extern "C" {
+    fn switch_translation_tables_el1();
+}
 
 #[no_mangle]
 extern "C" fn arch_main() -> ! {
@@ -57,17 +63,34 @@ impl Arch for ArchImpl {
             None => (0, 0),
         };
 
-        let current_el = get_current_el();
+        let mut current_el = get_current_el();
+        if current_el == Some(CurrentEL::EL::Value::EL1){
+            log::info!("current_el is el1"); 
+        }else if current_el == Some(CurrentEL::EL::Value::EL2){
+            log::info!("current_el is el2");
+        }
         assert!(current_el == Some(CurrentEL::EL::Value::EL2));
 
         unsafe {
             set_tpidr(core_id);
         }
-
+        log::info!("finish set tpidr");
         unsafe {
-            switch_translation_tables_el2();
+            drop_to_el1();
+        }
+        log::info!("finish drop to el1");
+        current_el = get_current_el();
+        assert!(current_el == Some(CurrentEL::EL::Value::EL1));
+        log::info!("now is at el1");
+        // unsafe {
+        //     switch_translation_tables_el2();
+        // }
+        
+        unsafe {
+            switch_translation_tables_el1();
         }
 
+        log::info!("start call kernel_entry");
         (kernel_entry)(
             payload_info.user_image.phys_addr_range.start,
             payload_info.user_image.phys_addr_range.end,

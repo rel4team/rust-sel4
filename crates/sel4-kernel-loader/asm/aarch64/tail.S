@@ -46,3 +46,39 @@ BEGIN_FUNC(switch_translation_tables_el2)
     ret
 
 END_FUNC(switch_translation_tables_el2)
+
+BEGIN_FUNC(drop_to_el1)
+    stp     x29, x30, [sp, #-16]!
+    mov     x29, sp
+    bl      clean_and_invalideate_dcache
+    
+    disable_mmu sctlr_el2,x9
+    bl      invalidate_icache
+
+    mov     x9, #(1 << 31)
+    msr     hcr_el2, x9
+
+    mov     x9, #0x33ff
+    msr     cptr_el2, x9
+    msr     hstr_el2, xzr
+    msr     vttbr_el2, xzr
+
+    disable_mmu sctlr_el1 , x9
+
+    mov     x9, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT | PSR_MODE_EL1h)
+    msr     spsr_el2, x9
+
+    ldp     x29, x30, [sp], #16
+    mov     x10, sp
+    msr     sp_el1, x10
+    msr     elr_el2, x30
+    eret
+END_FUNC(drop_to_el1)
+
+BEGIN_FUNC(switch_translation_tables_el1)
+    stp     x29, x30, [sp, #-16]!
+    mov     x29, sp
+    isb
+    ldp     x29, x30, [sp], #16
+    ret
+END_FUNC(switch_translation_tables_el1)
