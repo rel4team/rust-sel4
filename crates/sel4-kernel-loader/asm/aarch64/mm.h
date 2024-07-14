@@ -13,6 +13,16 @@
 #define TCR_PS TCR_PS_16T
 #endif
 
+#define TCR_ISH 0
+
+#define MT_DEVICE_nGnRnE  0
+#define MT_DEVICE_nGnRE   1
+#define MT_DEVICE_GRE     2
+#define MT_NORMAL_NC      3
+#define MT_NORMAL         4
+#define MT_NORMAL_WT      5
+#define MAIR(_attr, _mt)  ((_attr) << ((_mt) * 8))
+
 .macro disable_mmu sctlr tmp
     mrs     \tmp, \sctlr
     bic     \tmp, \tmp, #(1 << 0)
