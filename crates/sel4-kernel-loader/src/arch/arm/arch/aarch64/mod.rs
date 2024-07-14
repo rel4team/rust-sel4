@@ -64,11 +64,6 @@ impl Arch for ArchImpl {
         };
 
         let mut current_el = get_current_el();
-        if current_el == Some(CurrentEL::EL::Value::EL1){
-            log::info!("current_el is el1"); 
-        }else if current_el == Some(CurrentEL::EL::Value::EL2){
-            log::info!("current_el is el2");
-        }
         assert!(current_el == Some(CurrentEL::EL::Value::EL2));
 
         unsafe {
