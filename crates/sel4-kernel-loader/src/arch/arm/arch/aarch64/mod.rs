@@ -69,19 +69,19 @@ impl Arch for ArchImpl {
         unsafe {
             set_tpidr(core_id);
         }
-        
-        unsafe {
-            drop_to_el1();
-        }
-        current_el = get_current_el();
-        assert!(current_el == Some(CurrentEL::EL::Value::EL1));
-        
-        // unsafe {
-        //     switch_translation_tables_el2();
-        // }
-        
-        unsafe {
-            switch_translation_tables_el1();
+        if sel4_cfg_bool!(ARM_HYPERVISOR_SUPPORT) {
+            unsafe {
+                switch_translation_tables_el2();
+            }
+        } else {
+            unsafe {
+                drop_to_el1();
+            }
+            current_el = get_current_el();
+            assert!(current_el == Some(CurrentEL::EL::Value::EL1));
+            unsafe {
+                switch_translation_tables_el1();
+            }
         }
 
         (kernel_entry)(
