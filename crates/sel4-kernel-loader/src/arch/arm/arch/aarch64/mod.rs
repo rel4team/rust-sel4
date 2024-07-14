@@ -74,14 +74,13 @@ impl Arch for ArchImpl {
         unsafe {
             set_tpidr(core_id);
         }
-        log::info!("finish set tpidr");
+        
         unsafe {
             drop_to_el1();
         }
-        log::info!("finish drop to el1");
         current_el = get_current_el();
         assert!(current_el == Some(CurrentEL::EL::Value::EL1));
-        log::info!("now is at el1");
+        
         // unsafe {
         //     switch_translation_tables_el2();
         // }
@@ -90,7 +89,6 @@ impl Arch for ArchImpl {
             switch_translation_tables_el1();
         }
 
-        log::info!("start call kernel_entry");
         (kernel_entry)(
             payload_info.user_image.phys_addr_range.start,
             payload_info.user_image.phys_addr_range.end,
