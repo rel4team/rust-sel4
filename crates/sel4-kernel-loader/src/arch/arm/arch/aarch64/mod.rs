@@ -20,6 +20,12 @@ pub(crate) mod exception_handler;
 extern "C" {
     fn switch_translation_tables_el2();
 }
+extern "C" {
+    fn drop_to_el1();
+}
+extern "C" {
+    fn switch_translation_tables_el1();
+}
 
 #[no_mangle]
 extern "C" fn arch_main() -> ! {
@@ -57,15 +63,25 @@ impl Arch for ArchImpl {
             None => (0, 0),
         };
 
-        let current_el = get_current_el();
+        let mut current_el = get_current_el();
         assert!(current_el == Some(CurrentEL::EL::Value::EL2));
 
         unsafe {
             set_tpidr(core_id);
         }
-
-        unsafe {
-            switch_translation_tables_el2();
+        if sel4_cfg_bool!(ARM_HYPERVISOR_SUPPORT) {
+            unsafe {
+                switch_translation_tables_el2();
+            }
+        } else {
+            unsafe {
+                drop_to_el1();
+            }
+            current_el = get_current_el();
+            assert!(current_el == Some(CurrentEL::EL::Value::EL1));
+            unsafe {
+                switch_translation_tables_el1();
+            }
         }
 
         (kernel_entry)(
