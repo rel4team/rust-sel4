@@ -11,6 +11,7 @@ use aarch64_cpu::registers::CurrentEL;
 use tock_registers::interfaces::Readable;
 
 use sel4_kernel_loader_payload_types::PayloadInfo;
+use sel4_config::sel4_cfg_bool;
 
 use crate::{arch::Arch, main, secondary_main};
 
