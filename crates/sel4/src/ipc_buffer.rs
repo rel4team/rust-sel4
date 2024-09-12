@@ -86,6 +86,6 @@ impl IPCBuffer {
         let inner = self.inner_mut();
         inner.receiveCNode = slot.root().bits();
         inner.receiveIndex = slot.path().bits();
-        inner.receiveCNode = slot.path().depth().try_into().unwrap();
+        inner.receiveDepth = slot.path().depth().try_into().unwrap();
     }
 }
